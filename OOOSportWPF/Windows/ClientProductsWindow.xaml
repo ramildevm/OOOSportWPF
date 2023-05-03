@@ -71,11 +71,12 @@
                         <Setter Property="FontFamily" Value="Comic Sans MS"/>
                     </Style>
                     <Style TargetType="Button">
-                        <Setter Property="Width" Value="80"/>
-                        <Setter Property="Height" Value="50"/>
-                        <Setter Property="Background" Value="Orange"/>
+                        <Setter Property="Width" Value="Auto"/>
+                        <Setter Property="Height" Value="30"/>
+                        <Setter Property="Background" Value="#498C51"/>
                         <Setter Property="FontFamily" Value="Comic Sans MS"/>
                         <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="Foreground" Value="White"/>
                         <Setter Property="FontWeight" Value="Bold"/>
                         <Setter Property="Margin" Value="10"/>
                     </Style>

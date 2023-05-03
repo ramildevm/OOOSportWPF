@@ -26,28 +26,37 @@ namespace OOOSportWPF
         public MainWindow()
         {
             InitializeComponent();
+            txtLogin.Text = "loginDEpxl2018";
+            txtPassword.Password = "P6h4Jq";
         }
 
 
-        private void ButtonLogin_Click(object sender, RoutedEventArgs e)
+        private async void ButtonLogin_Click(object sender, RoutedEventArgs e)
         {
             if (!isFirstTry)
             {
                 CaptchaWindow captcha = new CaptchaWindow();
-                if (captcha.ShowDialog() == true)
+                var result = captcha.ShowDialog();
+                if (result == true)
                 {
                     isFirstTry = true;
                 }
-                else
+                else 
                 {
                     btnLogin.IsEnabled = false;
-                    Thread.Sleep(10000);
+                    await Task.Delay(10000);
                     btnLogin.IsEnabled = true;
+                    return;
                 }
             }
 
             var login = txtLogin.Text;
             var password = txtPassword.Password;
+            if(String.IsNullOrEmpty(login) || String.IsNullOrEmpty(password)) {
+                MessageBox.Show("Не все поля заполнены!");
+                isFirstTry = false;
+                return;
+            }
             using (var db = new EntityModel())
             {
                 var user = db.User.Where(u => u.UserLogin == login && u.UserPassword == password).FirstOrDefault();
@@ -67,7 +76,7 @@ namespace OOOSportWPF
                     }
                     else if (role.RoleName == db.Role.Find(2).RoleName)
                     {
-                        new AdminProductsWindow().Show();
+                        new AdminProductsWindow(user).Show();
                         this.Close();
                     }
                     else if (role.RoleName == db.Role.Find(3).RoleName)

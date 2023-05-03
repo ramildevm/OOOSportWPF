@@ -35,13 +35,13 @@ namespace OOOSportWPF.Windows
             {
                 captcha += allowchar[rnd.Next(0, allowchar.Length - 1)]; 
             }
-            txtCaptcha.Content = captcha;
+            txtCaptcha.Text = captcha;
 
         }
 
         private void ButtonCheck_Click(object sender, RoutedEventArgs e)
         {
-            if (txtCaptchaCheck.Text.ToString() == txtCaptcha.Content.ToString())
+            if (txtCaptchaCheck.Text.ToString() == txtCaptcha.Text.ToString())
                 this.DialogResult = true;
             else
                 this.DialogResult = false;

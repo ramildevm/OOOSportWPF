@@ -52,7 +52,7 @@ namespace OOOSportWPF.Windows
             productPanel = productsPanel;
             using (var db = new EntityModel())
             {
-                var productsAll = db.Product.ToList();
+                var productsAll = db.Product.OrderByDescending(v => v.ProductID).ToList();
                 if (filterText.Replace(" ", "") != "")
                 {
                     products = (from p in db.Product where p.ProductName.Contains(filterText) select p).ToList();
@@ -82,7 +82,7 @@ namespace OOOSportWPF.Windows
                 }
                 else
                 {
-                    products = products.OrderBy(p => p.ProductID).ToList();
+                    products = products.OrderByDescending(p => p.ProductID).ToList();
                 }
                 txtCount.Text = $"Количество товаров: {products.Count()} из {productsAll.Count()}.";
             }
@@ -123,9 +123,10 @@ namespace OOOSportWPF.Windows
                     endPanel.RowDefinitions.Add(new RowDefinition());
                     endPanel.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(70) });
 
-                    var txtDiscount = new TextBlock() { FontSize = 20, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, FontWeight = FontWeights.Bold };
+                    var txtDiscount = new TextBlock() { FontSize = 18, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, FontWeight = FontWeights.Bold };
                     var btnAdd = new Button() { Content = "Добавить", Tag = product };
-                    btnAdd.Click += BtnEdit_Click;
+
+                    btnAdd.Click += BtnAdd_Click;
                     Grid.SetRow(txtDiscount, 0);
                     Grid.SetRow(btnAdd, 1);
                     endPanel.Children.Add(txtDiscount);
@@ -136,7 +137,7 @@ namespace OOOSportWPF.Windows
                     txtManufacturer.Text += db.ProductManufacturer.Find(product.ProductManufacturerID).ProductManufacturerName;
                     txtPrice.Text += product.ProductCost;
 
-                    txtDiscount.Text += product.ProductMaxDiscountAmount;
+                    txtDiscount.Text += "Скидка до -" + product.ProductMaxDiscountAmount + "%";
                     if (product.ProductMaxDiscountAmount > 15)
                     {
                         txtDiscount.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#7fff00"));
@@ -155,7 +156,7 @@ namespace OOOSportWPF.Windows
             }
         }
 
-        private void BtnEdit_Click(object sender, RoutedEventArgs e)
+        private void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
             throw new NotImplementedException();
         }

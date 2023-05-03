@@ -70,6 +70,9 @@
     <Compile Include="Windows\CaptchaWindow.xaml.cs">
       <DependentUpon>CaptchaWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\MakeEditProductWindow.xaml.cs">
+      <DependentUpon>MakeEditProductWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\ManagerProductsWindow.xaml.cs">
       <DependentUpon>ManagerProductsWindow.xaml</DependentUpon>
     </Compile>
@@ -104,6 +107,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Windows\MakeEditProductWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\ManagerProductsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
