@@ -78,23 +78,36 @@ namespace OOOSportWPF.Windows
         {
             using (var db = new EntityModel())
             {
+
+                if (String.IsNullOrEmpty(artikulTextBox.Text) ||
+                    String.IsNullOrEmpty(unitCostTextBox.Text) ||
+                    String.IsNullOrEmpty(maxDiscountTextBox.Text) ||
+                    String.IsNullOrEmpty(nameTextBox.Text) ||
+                    String.IsNullOrEmpty(currentDiscountTextBox.Text) ||
+                    String.IsNullOrEmpty(quantityTextBox.Text) ||
+                    String.IsNullOrEmpty(descriptionTextBox.Text) ||
+                    unitComboBox.SelectedIndex == -1 ||
+                    manufacturerComboBox.SelectedIndex == -1 ||
+                    supplierComboBox.SelectedIndex == -1 ||
+                    categoryComboBox.SelectedIndex == -1)
+                {
+                    MessageBox.Show("Не все поля заполнены!");
+                    return;
+                }
+                try
+                {
+                    Convert.ToDecimal(unitCostTextBox.Text.Replace('.', ','));
+                    Convert.ToByte(maxDiscountTextBox.Text);
+                    Convert.ToByte(currentDiscountTextBox.Text);
+                    Convert.ToInt32(quantityTextBox.Text);
+                }
+                catch (FormatException exp)
+                {
+                    MessageBox.Show("Поля имеют неверный формат!");
+                    return;
+                }
                 if (Product.ProductID == 0)
                 {
-                    if(String.IsNullOrEmpty(artikulTextBox.Text) ||
-                        String.IsNullOrEmpty(unitCostTextBox.Text) ||
-                        String.IsNullOrEmpty(maxDiscountTextBox.Text) ||
-                        String.IsNullOrEmpty(nameTextBox.Text) ||
-                        String.IsNullOrEmpty(currentDiscountTextBox.Text) ||
-                        String.IsNullOrEmpty(quantityTextBox.Text) ||
-                        String.IsNullOrEmpty(descriptionTextBox.Text) ||
-                        unitComboBox.SelectedIndex==-1 ||
-                        manufacturerComboBox.SelectedIndex == -1 ||
-                        supplierComboBox.SelectedIndex == -1 ||
-                        categoryComboBox.SelectedIndex == -1 )
-                    {
-                        MessageBox.Show("Не все поля заполнены!");
-                        return;
-                    }
                     Product.ProductArticleNumber = artikulTextBox.Text;
                     Product.ProductName = nameTextBox.Text;
                     Product.UnitTypeID = unitComboBox.SelectedIndex + 1;
@@ -113,25 +126,10 @@ namespace OOOSportWPF.Windows
                 }
                 else
                 {
-                    if (String.IsNullOrEmpty(artikulTextBox.Text) ||
-                        String.IsNullOrEmpty(unitCostTextBox.Text) ||
-                        String.IsNullOrEmpty(maxDiscountTextBox.Text) ||
-                        String.IsNullOrEmpty(nameTextBox.Text) ||
-                        String.IsNullOrEmpty(currentDiscountTextBox.Text) ||
-                        String.IsNullOrEmpty(quantityTextBox.Text) ||
-                        String.IsNullOrEmpty(descriptionTextBox.Text) ||
-                        unitComboBox.SelectedIndex == -1 ||
-                        manufacturerComboBox.SelectedIndex == -1 ||
-                        supplierComboBox.SelectedIndex == -1 ||
-                        categoryComboBox.SelectedIndex == -1)
-                    {
-                        MessageBox.Show("Не все поля заполнены!");
-                        return;
-                    }
                     Product.ProductArticleNumber = artikulTextBox.Text;
                     Product.ProductName = nameTextBox.Text;
                     Product.UnitTypeID = unitComboBox.SelectedIndex + 1;
-                    Product.ProductCost = Convert.ToInt32(unitCostTextBox.Text);
+                    Product.ProductCost = Convert.ToDecimal(unitCostTextBox.Text.Replace('.',','));
                     Product.ProductMaxDiscountAmount = Convert.ToByte(maxDiscountTextBox.Text);
                     Product.ProductManufacturerID = manufacturerComboBox.SelectedIndex + 1;
                     Product.ProductSupplierID = supplierComboBox.SelectedIndex + 1;
