@@ -43,7 +43,7 @@
                 <TextBlock Margin="0,5,0,0" HorizontalAlignment="Center" FontFamily="Comic Sans MS" FontSize="12">
                     <Hyperlink Foreground="#150098" Click="Hyperlink_Click">Продолжить как гость</Hyperlink>
                 </TextBlock>
-                <Button Content="Войти" Width="171" Height="36" Cursor="Hand" FontWeight="Bold" Background="White" Margin="0,15,0,10" BorderThickness="0" Click="ButtonLogin_Click">
+                <Button Name="btnLogin" Content="Войти" Width="171" Height="36" Cursor="Hand" FontWeight="Bold" Background="White" Margin="0,15,0,10" BorderThickness="0" Click="ButtonLogin_Click">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="10"/>

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,7 +40,9 @@ namespace OOOSportWPF
                 }
                 else
                 {
-                    return;
+                    btnLogin.IsEnabled = false;
+                    Thread.Sleep(10000);
+                    btnLogin.IsEnabled = true;
                 }
             }
 
@@ -59,32 +62,28 @@ namespace OOOSportWPF
                     var role = db.Role.Find(user.RoleID);
                     if (role.RoleName == db.Role.Find(1).RoleName)
                     {
+                        new ClientProductsWindow(user).Show();
                         this.Close();
-                        new ClientProductsWindow(true).ShowDialog();
                     }
                     else if (role.RoleName == db.Role.Find(2).RoleName)
                     {
+                        new AdminProductsWindow().Show();
                         this.Close();
-                        new AdminProductsWindow().ShowDialog();
                     }
                     else if (role.RoleName == db.Role.Find(3).RoleName)
                     {
+                        new ManagerProductsWindow().Show();
                         this.Close();
-                        new ManagerProductsWindow().ShowDialog();
                     }
                 }
             }
 
         }
 
-        private void makeCaptchaMethod()
-        {
-
-        }
-
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
-            new ClientProductsWindow(false).ShowDialog();
+            new ClientProductsWindow(null).Show();
+            this.Close();
         }
     }
 }

@@ -37,7 +37,6 @@ namespace OOOSportWPF.Windows
             }
             txtCaptcha.Content = captcha;
 
-
         }
 
         private void ButtonCheck_Click(object sender, RoutedEventArgs e)
@@ -45,7 +44,7 @@ namespace OOOSportWPF.Windows
             if (txtCaptchaCheck.Text.ToString() == txtCaptcha.Content.ToString())
                 this.DialogResult = true;
             else
-                makeCaptcha();
+                this.DialogResult = false;
         }
     }
 }

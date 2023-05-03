@@ -144,5 +144,20 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Products\B538G6.jpg" />
+    <Resource Include="Resources\Products\D648N7.jpg" />
+    <Resource Include="Resources\Products\D830R5.jpg" />
+    <Resource Include="Resources\Products\E324U7.jpg" />
+    <Resource Include="Resources\Products\F735B6.jpg" />
+    <Resource Include="Resources\Products\F746E6.jpg" />
+    <Resource Include="Resources\Products\F937G4.jpg" />
+    <Resource Include="Resources\Products\G403T5.jpg" />
+    <Resource Include="Resources\Products\G598Y6.jpg" />
+    <Resource Include="Resources\Products\А112Т4.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\picture.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

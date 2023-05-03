@@ -5,8 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OOOSportWPF"
         mc:Ignorable="d"
-        Title="Товары" Height="500" Width="800" MinHeight="500" MinWidth="800">
-    <Grid>
+        Title="Товары" Height="600" Width="800" MinHeight="500" MinWidth="800">
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Comic Sans MS"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="FontFamily" Value="Comic Sans MS"/>
+        </Style>
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="FontFamily" Value="Comic Sans MS"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="FontFamily" Value="Comic Sans MS"/>
+        </Style>
+    </Window.Resources>
+    <Grid Background="#22000000">
         <Grid.RowDefinitions>
             <RowDefinition Height="80"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -17,20 +31,38 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="ExitButton" Content="Вернуться назад" Margin="10" Click="ExitButton_Click"></Button>
+            <Button x:Name="ExitButton" Background="Transparent" BorderThickness="0" FontWeight="Bold" FontSize="18" Content="ООО «Спорт»" Margin="10" Click="ExitButton_Click"></Button>
+            <TextBlock Grid.Column="3" x:Name="txtFIO" HorizontalAlignment="Center" VerticalAlignment="Center" Text=""/>
+            <TextBlock Grid.Column="3" x:Name="txtCount" HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="Количество товаров: " Margin="5"/>
         </Grid>
-        <UniformGrid Grid.Row="1" Columns="3">
-            <TextBox  x:Name="txtSearch" TextChanged="SearchTextBox_TextChanged" Margin="10"/>
-            <ComboBox x:Name="myComboBox"  Margin="10" SelectionChanged="myComboBox_SelectionChanged">
+        <Grid Grid.Row="1" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition />
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="txtSearch" TextChanged="SearchTextBox_TextChanged" Margin="10"/>
+            <TextBlock Grid.Column="1" Text="Скидка:" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+            <ComboBox Grid.Column="2" x:Name="discountComboBox"  Margin="10" SelectionChanged="myComboBox_SelectionChanged">
                 <ComboBoxItem Content="0-9,99%"/>
                 <ComboBoxItem Content="10-14,99%"/>
                 <ComboBoxItem Content="15%"/>
                 <ComboBoxItem Content="Все"/>
             </ComboBox>
-        </UniformGrid>
+            <TextBlock Grid.Column="3" Text="Цена:" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+            <ComboBox Grid.Column="4" x:Name="priceComboBox" Margin="10" SelectionChanged="priceComboBox_SelectionChanged">
+                <ComboBoxItem Content="По убыванию ↓"/>
+                <ComboBoxItem Content="По возрастанию ↑"/>
+                <ComboBoxItem Content="По умолчанию"/>
+            </ComboBox>
+        </Grid>
         <ScrollViewer Grid.Row="2" >
-            <StackPanel Name="productsPanel" Orientation="Vertical" Background="#22000000" Style="{Binding Source=StackPanel}">
+            <StackPanel Name="productsPanel" Orientation="Vertical"  Style="{Binding Source=StackPanel}">
                 <StackPanel.Resources>
                     <Style TargetType="TextBlock">
                         <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
@@ -51,8 +83,12 @@
                         <Setter Property="Margin" Value="10"/>
                         <Setter Property="Background" Value="#fff"/>
                     </Style>
+                    <Style TargetType="Image">
+                        <Setter Property="Margin" Value="10"/>
+                    </Style>
                 </StackPanel.Resources>
             </StackPanel>
         </ScrollViewer>
+        <Grid Grid.Row="3" Background="#76E383"></Grid>
     </Grid>
 </Window>

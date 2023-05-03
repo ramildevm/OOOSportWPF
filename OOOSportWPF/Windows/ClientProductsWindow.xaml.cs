@@ -23,51 +23,76 @@ namespace OOOSportWPF.Windows
         StackPanel productPanel;
         string filterText = "";
         string filterDiscount = "";
+        int filterPrice = 2;
+        private User User;
+
         public ClientProductsWindow()
         {
             InitializeComponent();
-            loadDataSet("");
+            loadDataSet();
             loadData();
         }
-        public ClientProductsWindow(bool flag)
+        public ClientProductsWindow(User user)
         {
             InitializeComponent();
-            loadDataSet("");
+            this.User = user;
+            InitializeWindowData();
+            loadDataSet();
             loadData();
         }
 
-        private void loadDataSet(string v)
+        private void InitializeWindowData()
+        {
+            if(User!=null)
+                txtFIO.Text = $"{User.UserSurname} {User.UserName} {User.UserPatronymic}";
+        }
+
+        private void loadDataSet()
         {
             productPanel = productsPanel;
             using (var db = new EntityModel())
             {
-                if(filterText.Replace(" ", "") != "")
+                var productsAll = db.Product.ToList();
+                if (filterText.Replace(" ", "") != "")
                 {
                     products = (from p in db.Product where p.ProductName.Contains(filterText) select p).ToList();
                 }
                 else
                 {
-                    products = db.Product.ToList();
+                    products = productsAll;
                 }
-                if (v == "0")
+                if (filterDiscount == "0")
                 {
                     products = (from p in products where p.ProductMaxDiscountAmount < 10 select p).ToList();
                 }
-                else if (v == "10")
+                else if (filterDiscount == "10")
                 {
-                    products = (from p in products where p.ProductMaxDiscountAmount < 15 && p.ProductMaxDiscountAmount > 10 select p).ToList();
+                    products = (from p in products where p.ProductMaxDiscountAmount < 15 && p.ProductMaxDiscountAmount >= 10 select p).ToList();
                 }
-                else if (v == "15")
+                else if (filterDiscount == "15")
                 {
-                    products = (from p in products where p.ProductMaxDiscountAmount > 15 select p).ToList();
+                    products = (from p in products where p.ProductMaxDiscountAmount >= 15 select p).ToList();
                 }
+                if (filterPrice == 0)
+                {
+                    products = products.OrderByDescending(p => p.ProductCost).ToList();
+                }else if (filterPrice == 1)
+                {
+                    products = products.OrderBy(p => p.ProductCost).ToList();
+                }
+                else
+                {
+                    products = products.OrderBy(p => p.ProductID).ToList();
+                }
+                txtCount.Text = $"Количество товаров: {products.Count()} из {productsAll.Count()}.";
             }
         }
 
         private void loadData()
         {
             productsPanel.Children.Clear();
-            using (var db = new EntityModel()) {
+            using (var db = new EntityModel())
+            {
                 foreach (var product in products)
                 {
                     var mainPanel = new Grid();
@@ -76,9 +101,16 @@ namespace OOOSportWPF.Windows
                     mainPanel.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(100) });
 
                     var image = new Image();
+                    BitmapImage bitmap;
+                    var imagePath = product.ProductPhoto;
+                    if (imagePath != null && !String.IsNullOrEmpty(imagePath))
+                        bitmap = new BitmapImage(new Uri(@"pack://application:,,,/Resources/Products/" + imagePath));
+                    else
+                        bitmap = new BitmapImage(new Uri(@"pack://application:,,,/Resources/picture.png"));
+                    image.Source = bitmap;
 
-                    var middlePanel = new StackPanel() { Orientation = Orientation.Vertical, Margin = new Thickness(10,10,10,10)};
-                    var txtName = new TextBlock() { Text = "Название продукта: ", FontWeight=FontWeights.Bold};
+                    var middlePanel = new StackPanel() { Orientation = Orientation.Vertical, Margin = new Thickness(10, 10, 10, 10) };
+                    var txtName = new TextBlock() { Text = "Название продукта: ", FontWeight = FontWeights.Bold };
                     var txtDesc = new TextBlock() { Text = "Описание: " };
                     var txtManufacturer = new TextBlock() { Text = "Производитель: " };
                     var txtPrice = new TextBlock() { Text = "Цена: " };
@@ -89,9 +121,9 @@ namespace OOOSportWPF.Windows
 
                     var endPanel = new Grid() { Margin = new Thickness(5, 5, 5, 5) };
                     endPanel.RowDefinitions.Add(new RowDefinition());
-                    endPanel.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(70)});
+                    endPanel.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(70) });
 
-                    var txtDiscount = new TextBlock() { FontSize = 20, HorizontalAlignment=HorizontalAlignment.Center, VerticalAlignment=VerticalAlignment.Center, FontWeight = FontWeights.Bold };
+                    var txtDiscount = new TextBlock() { FontSize = 20, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, FontWeight = FontWeights.Bold };
                     var btnAdd = new Button() { Content = "Добавить", Tag = product };
                     btnAdd.Click += BtnEdit_Click;
                     Grid.SetRow(txtDiscount, 0);
@@ -130,46 +162,53 @@ namespace OOOSportWPF.Windows
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
+            new MainWindow().Show();
             this.Close();
-            new MainWindow().ShowDialog();
-            
+
         }
 
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             filterText = txtSearch.Text;
-            loadDataSet(filterDiscount);
+            loadDataSet();
             loadData();
         }
         private void myComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox comboBox = sender as ComboBox;
-            ComboBoxItem selectedItem = comboBox.SelectedItem as ComboBoxItem;
+            int selectedItem = comboBox.SelectedIndex;
 
-            if (selectedItem != null)
-            {
-                string selectedValue = selectedItem.Content.ToString();
-                switch (selectedValue)
+                switch (selectedItem)
                 {
-                    case "0-9,99%":
+                    case 0:
                         filterDiscount = "0";
                         break;
-                    case "10-14,99%":
+                    case 1:
                         filterDiscount = "10";
                         break;
-                    case "15%":
+                    case 2:
                         filterDiscount = "15";
                         break;
-                    case "Все":
+                    case 3:
                         filterDiscount = "";
                         break;
                     default:
-                        break;
+                    filterDiscount = "";
+                    break;
                 }
 
-                loadDataSet(filterDiscount);
+                loadDataSet();
                 loadData();
-            }
+        }
+
+        private void priceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox comboBox = sender as ComboBox;
+            int selectedItem = comboBox.SelectedIndex;
+            filterPrice = selectedItem;
+            loadDataSet();
+            loadData();
+
         }
     }
 }
