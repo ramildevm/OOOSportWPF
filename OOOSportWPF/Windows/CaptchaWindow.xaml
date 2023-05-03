@@ -1,0 +1,30 @@
+﻿<Window x:Class="OOOSportWPF.Windows.CaptchaWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OOOSportWPF.Windows"
+        mc:Ignorable="d"
+        Title="Окно " Height="200" Width="300" >
+    <Window.Resources>
+        <Style TargetType="Label">
+            <Setter Property="FontFamily" Value="Comic Sans MS"/>
+        </Style>
+    </Window.Resources>
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Border  Margin="5">
+        <Label FontSize="20" FontStyle="Italic" FontWeight="Heavy" HorizontalContentAlignment="Center" Name="txtCaptcha"/>
+        </Border>
+        <Label Grid.Row="1" Content="Введите капчу:"/>
+        <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1"  Margin="10">
+            <TextBox  Name="txtCaptchaCheck"/>
+        </Border>
+        <Button Grid.Row="3" Margin="10" Content="Проверить" Click="ButtonCheck_Click" FontFamily="Comic Sans MS" Background="#76E383"/>
+    </Grid>
+</Window>
