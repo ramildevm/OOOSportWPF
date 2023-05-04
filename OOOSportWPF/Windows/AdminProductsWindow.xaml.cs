@@ -98,9 +98,9 @@ namespace OOOSportWPF.Windows
                     BitmapImage bitmap;
                     var imagePath = product.ProductPhoto;
                     if (imagePath != null && !String.IsNullOrEmpty(imagePath))
-                        bitmap = new BitmapImage(new Uri(@"pack://application:,,,/Resources/Products/" + imagePath));
+                        bitmap = new BitmapImage(new Uri(System.IO.Directory.GetParent(Environment.CurrentDirectory).Parent.FullName + "\\Resources\\Products\\" + imagePath));
                     else
-                        bitmap = new BitmapImage(new Uri(@"pack://application:,,,/Resources/picture.png"));
+                        bitmap = new BitmapImage(new Uri(System.IO.Directory.GetParent(Environment.CurrentDirectory).Parent.FullName + "\\Resources\\" + "picture.png"));
                     image.Source = bitmap;
 
                     var middlePanel = new StackPanel() { Orientation = Orientation.Vertical, Margin = new Thickness(10, 10, 10, 10) };
@@ -117,7 +117,7 @@ namespace OOOSportWPF.Windows
                     endPanel.RowDefinitions.Add(new RowDefinition());
                     endPanel.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(70) });
 
-                    var txtDiscount = new TextBlock() { FontSize = 20, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, FontWeight = FontWeights.Bold };
+                    var txtDiscount = new TextBlock() { FontSize = 18, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, FontWeight = FontWeights.Bold };
                     var btnEdit= new Button() { Content = "Изменить", Tag = product };
 
                     btnEdit.Click += BtnEdit_Click;

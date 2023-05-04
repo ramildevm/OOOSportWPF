@@ -102,7 +102,12 @@
                 <TextBox Grid.Row="10" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Path=ProductCost, Mode=TwoWay}" x:Name="unitCostTextBox"/>
 
                 <TextBlock Grid.Row="11" Grid.Column="0" Text="Изображение:" VerticalAlignment="Center"/>
-                <Image Margin="10" Grid.Row="11" Grid.Column="1"  Width="100" Height="100" x:Name="productImage" />
+                <UniformGrid Grid.Row="11" Grid.Column="1" Columns="2">
+                    <Border Margin="10"   Width="150" BorderBrush="Black" Height="150" BorderThickness="1" >
+                        <Image x:Name="productImage" />
+                    </Border>
+                    <Button Height="50" Content="Загрузить" Background="#498C51" Foreground="White" Padding="30,0,30,0" HorizontalAlignment="Center" Click="ButtonLoadImg_Click"/>
+                </UniformGrid>
 
                 <TextBlock Grid.Row="12" Grid.Column="0" Text="Подробное описание:"  VerticalAlignment="Center"/>
                 <TextBox Grid.Row="12" Grid.Column="1" VerticalAlignment="Center"  Text="{Binding Path=ProductDescription, Mode=TwoWay}" TextWrapping="Wrap" AcceptsReturn="True" x:Name="descriptionTextBox"/>

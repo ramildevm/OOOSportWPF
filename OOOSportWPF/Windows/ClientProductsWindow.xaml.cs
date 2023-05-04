@@ -104,9 +104,9 @@ namespace OOOSportWPF.Windows
                     BitmapImage bitmap;
                     var imagePath = product.ProductPhoto;
                     if (imagePath != null && !String.IsNullOrEmpty(imagePath))
-                        bitmap = new BitmapImage(new Uri(@"pack://application:,,,/Resources/Products/" + imagePath));
+                        bitmap = new BitmapImage(new Uri(System.IO.Directory.GetParent(Environment.CurrentDirectory).Parent.FullName + "\\Resources\\Products\\" + imagePath));
                     else
-                        bitmap = new BitmapImage(new Uri(@"pack://application:,,,/Resources/picture.png"));
+                        bitmap = new BitmapImage(new Uri(System.IO.Directory.GetParent(Environment.CurrentDirectory).Parent.FullName + "\\Resources\\" + "picture.png"));
                     image.Source = bitmap;
 
                     var middlePanel = new StackPanel() { Orientation = Orientation.Vertical, Margin = new Thickness(10, 10, 10, 10) };

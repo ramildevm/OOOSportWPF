@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -60,6 +63,13 @@ namespace OOOSportWPF.Windows
             }
             else
             {
+                var imagePath = Product.ProductPhoto;
+                if (imagePath != null && !String.IsNullOrEmpty(imagePath))
+                {
+                    var bitmap = new BitmapImage(new Uri(System.IO.Directory.GetParent(Environment.CurrentDirectory).Parent.FullName + "\\Resources\\Products\\" + imagePath));
+                    productImage.Source = bitmap.Clone();
+                    bitmap = null;
+                }
                 DataContext = Product;
                 artikulTextBox.IsEnabled = false;
                 categoryComboBox.SelectedIndex = Product.ProductCategoryID-1;
@@ -153,6 +163,45 @@ namespace OOOSportWPF.Windows
                 db.SaveChanges();
             }
             this.Close();
+        }
+
+
+        private void ButtonLoadImg_Click(object sender, RoutedEventArgs e)
+        {
+            if (String.IsNullOrEmpty(artikulTextBox.Text))
+            {
+                MessageBox.Show("Введите артикул товара!");
+                return;
+            }
+            OpenFileDialog op = new OpenFileDialog();
+            string folderpath = System.IO.Directory.GetParent(Environment.CurrentDirectory).Parent.FullName + "\\Resources\\Products\\";
+            op.Title = "Select a picture";
+            op.Filter = "All supported graphics|*.jpg;*.jpeg;*.png|" +
+                        "JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|" +
+                        "Portable Network Graphic (*.png)|*.png";
+
+            bool? myResult;
+            myResult = op.ShowDialog();
+            if (myResult != null && myResult == true)
+            {
+                byte[] imageBytes = File.ReadAllBytes(op.FileName);
+                string fileGuid = artikulTextBox.Text;
+                string fileExtension = System.IO.Path.GetExtension(op.FileName);
+                string fileName = fileGuid + fileExtension;
+                string newFilePath = System.IO.Path.Combine(folderpath, fileName);
+                productImage.Source = null;
+                using (var fileStream = new FileStream(newFilePath, FileMode.OpenOrCreate))
+                {
+                    fileStream.Write(imageBytes, 0, imageBytes.Length);
+                }
+
+                Uri fileUri = new Uri(newFilePath);
+                BitmapImage image = new BitmapImage(fileUri);                
+
+                Product.ProductPhoto = fileName;               
+                productImage.Source = image;
+            }
+            MessageBox.Show("Изображение загружено!");            
         }
     }
 }
