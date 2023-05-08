@@ -25,6 +25,7 @@ namespace OOOSportWPF.Windows
         string filterDiscount = "";
         int filterPrice = 2;
         private User User;
+        private List<Product> orderProducts = new List<Product>();
 
         public ClientProductsWindow()
         {
@@ -121,16 +122,11 @@ namespace OOOSportWPF.Windows
 
                     var endPanel = new Grid() { Margin = new Thickness(5, 5, 5, 5) };
                     endPanel.RowDefinitions.Add(new RowDefinition());
-                    endPanel.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(70) });
 
                     var txtDiscount = new TextBlock() { FontSize = 18, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, FontWeight = FontWeights.Bold };
-                    var btnAdd = new Button() { Content = "Добавить", Tag = product };
 
-                    btnAdd.Click += BtnAdd_Click;
                     Grid.SetRow(txtDiscount, 0);
-                    Grid.SetRow(btnAdd, 1);
                     endPanel.Children.Add(txtDiscount);
-                    endPanel.Children.Add(btnAdd);
 
                     txtName.Text += product.ProductName;
                     txtDesc.Text += product.ProductDescription;
@@ -151,6 +147,14 @@ namespace OOOSportWPF.Windows
                     mainPanel.Children.Add(middlePanel);
                     mainPanel.Children.Add(endPanel);
 
+                    ContextMenu contextMenu = new ContextMenu();
+                    MenuItem addMenuItem = new MenuItem();
+                    addMenuItem.Header = "Добавить к заказу";
+                    addMenuItem.Tag = product;
+                    contextMenu.Items.Add(addMenuItem);
+                    addMenuItem.Click += BtnAdd_Click;
+                    mainPanel.ContextMenu = contextMenu;
+
                     productPanel.Children.Add(mainPanel);
                 }
             }
@@ -158,7 +162,13 @@ namespace OOOSportWPF.Windows
 
         private void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            var product = (sender as MenuItem).Tag as Product;
+            if (orderProducts.IndexOf(product) == -1)
+            {
+                orderProducts.Add(product);
+                txtQuantity.Text = "Количество позиций в заказе: " + orderProducts.Count.ToString();
+                btnOrder.Visibility = Visibility.Visible;
+            }
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
@@ -210,6 +220,16 @@ namespace OOOSportWPF.Windows
             loadDataSet();
             loadData();
 
+        }
+
+        private void btnOrderProduct_Click(object sender, RoutedEventArgs e)
+        {
+            this.Hide();
+            new MakeOrderWindow(orderProducts,User).ShowDialog();
+            orderProducts.Clear();
+            txtQuantity.Text = "";
+            btnOrder.Visibility = Visibility.Collapsed;
+            this.Show();
         }
     }
 }

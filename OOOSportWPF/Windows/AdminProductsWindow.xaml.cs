@@ -115,16 +115,11 @@ namespace OOOSportWPF.Windows
 
                     var endPanel = new Grid() { Margin = new Thickness(5, 5, 5, 5) };
                     endPanel.RowDefinitions.Add(new RowDefinition());
-                    endPanel.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(70) });
 
                     var txtDiscount = new TextBlock() { FontSize = 18, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, FontWeight = FontWeights.Bold };
-                    var btnEdit = new Button() { Content = "Изменить", Tag = product };
 
-                    btnEdit.Click += BtnEdit_Click;
                     Grid.SetRow(txtDiscount, 0);
-                    Grid.SetRow(btnEdit, 1);
                     endPanel.Children.Add(txtDiscount);
-                    endPanel.Children.Add(btnEdit);
 
                     txtName.Text += product.ProductName;
                     txtDesc.Text += product.ProductDescription;
@@ -145,6 +140,14 @@ namespace OOOSportWPF.Windows
                     mainPanel.Children.Add(middlePanel);
                     mainPanel.Children.Add(endPanel);
 
+                    ContextMenu contextMenu = new ContextMenu();
+                    MenuItem addMenuItem = new MenuItem();
+                    addMenuItem.Header = "Изменить";
+                    addMenuItem.Tag = product;
+                    contextMenu.Items.Add(addMenuItem);
+                    addMenuItem.Click += BtnEdit_Click;
+                    mainPanel.ContextMenu = contextMenu;
+                    
                     productPanel.Children.Add(mainPanel);
                 }
             }
@@ -153,7 +156,7 @@ namespace OOOSportWPF.Windows
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             this.Hide();
-            new MakeEditProductWindow((sender as Button).Tag as Product).ShowDialog();
+            new MakeEditProductWindow((sender as MenuItem).Tag as Product).ShowDialog();
             loadDataSet();
             loadData();
             this.Show();

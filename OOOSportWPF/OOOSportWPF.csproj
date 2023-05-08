@@ -74,6 +74,9 @@
     <Compile Include="Windows\MakeEditProductWindow.xaml.cs">
       <DependentUpon>MakeEditProductWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\MakeOrderWindow.xaml.cs">
+      <DependentUpon>MakeOrderWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\ManagerProductsWindow.xaml.cs">
       <DependentUpon>ManagerProductsWindow.xaml</DependentUpon>
     </Compile>
@@ -109,6 +112,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Windows\MakeEditProductWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\MakeOrderWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

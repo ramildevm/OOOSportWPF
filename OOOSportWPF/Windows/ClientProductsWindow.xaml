@@ -70,16 +70,6 @@
                         <Setter Property="FontSize" Value="14"/>
                         <Setter Property="FontFamily" Value="Comic Sans MS"/>
                     </Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Width" Value="Auto"/>
-                        <Setter Property="Height" Value="30"/>
-                        <Setter Property="Background" Value="#498C51"/>
-                        <Setter Property="FontFamily" Value="Comic Sans MS"/>
-                        <Setter Property="FontSize" Value="12"/>
-                        <Setter Property="Foreground" Value="White"/>
-                        <Setter Property="FontWeight" Value="Bold"/>
-                        <Setter Property="Margin" Value="10"/>
-                    </Style>
                     <Style TargetType="Grid">
                         <Setter Property="Margin" Value="10"/>
                         <Setter Property="Background" Value="#fff"/>
@@ -90,6 +80,9 @@
                 </StackPanel.Resources>
             </StackPanel>
         </ScrollViewer>
-        <Grid Grid.Row="3" Background="#76E383"></Grid>
+        <Grid Grid.Row="3" Background="#76E383">
+            <TextBlock Name="txtQuantity"  HorizontalAlignment="Left" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="16"/>
+            <Button Name="btnOrder" Visibility="Collapsed" Width="150" Height="50" HorizontalAlignment="Right" Margin="10" Background="White" Click="btnOrderProduct_Click" Content="Сформировать заказ" />
+        </Grid>
     </Grid>
 </Window>
