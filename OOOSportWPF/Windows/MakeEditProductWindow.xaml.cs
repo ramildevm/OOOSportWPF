@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -63,6 +65,8 @@ namespace OOOSportWPF.Windows
             }
             else
             {
+                string folderpath = System.IO.Directory.GetParent(Environment.CurrentDirectory).Parent.FullName + "\\Resources\\Products\\";
+
                 var imagePath = Product.ProductPhoto;
                 if (imagePath != null && !String.IsNullOrEmpty(imagePath))
                 {
@@ -70,12 +74,13 @@ namespace OOOSportWPF.Windows
                     productImage.Source = bitmap.Clone();
                     bitmap = null;
                 }
+
                 DataContext = Product;
                 artikulTextBox.IsEnabled = false;
-                categoryComboBox.SelectedIndex = Product.ProductCategoryID-1;
-                manufacturerComboBox.SelectedIndex = Product.ProductManufacturerID-1;
-                supplierComboBox.SelectedIndex = Product.ProductSupplierID-1;
-                unitComboBox.SelectedIndex = Product.UnitTypeID-1;
+                categoryComboBox.SelectedIndex = Product.ProductCategoryID - 1;
+                manufacturerComboBox.SelectedIndex = Product.ProductManufacturerID - 1;
+                supplierComboBox.SelectedIndex = Product.ProductSupplierID - 1;
+                unitComboBox.SelectedIndex = Product.UnitTypeID - 1;
             }
         }
 
@@ -118,17 +123,21 @@ namespace OOOSportWPF.Windows
                 }
                 if (Product.ProductID == 0)
                 {
-                    Product.ProductArticleNumber = artikulTextBox.Text;
-                    Product.ProductName = nameTextBox.Text;
-                    Product.UnitTypeID = unitComboBox.SelectedIndex + 1;
-                    Product.ProductCost = Convert.ToInt32(unitCostTextBox.Text);
-                    Product.ProductMaxDiscountAmount = Convert.ToByte(maxDiscountTextBox.Text);
-                    Product.ProductManufacturerID = manufacturerComboBox.SelectedIndex + 1;
-                    Product.ProductSupplierID = supplierComboBox.SelectedIndex + 1;
-                    Product.ProductCategoryID = categoryComboBox.SelectedIndex + 1;
-                    Product.ProductDiscountAmount = Convert.ToByte(currentDiscountTextBox.Text);
-                    Product.ProductQuantityInStock = Convert.ToInt32(quantityTextBox.Text);
-                    Product.ProductDescription = descriptionTextBox.Text;
+                    Product = new Product
+                    {
+                        ProductArticleNumber = artikulTextBox.Text,
+                        ProductName = nameTextBox.Text,
+                        UnitTypeID = unitComboBox.SelectedIndex + 1,
+                        ProductCost = Convert.ToDecimal(unitCostTextBox.Text.Replace('.', ',')),
+                        ProductMaxDiscountAmount = Convert.ToByte(maxDiscountTextBox.Text),
+                        ProductManufacturerID = manufacturerComboBox.SelectedIndex + 1,
+                        ProductSupplierID = supplierComboBox.SelectedIndex + 1,
+                        ProductCategoryID = categoryComboBox.SelectedIndex + 1,
+                        ProductDiscountAmount = Convert.ToByte(currentDiscountTextBox.Text),
+                        ProductQuantityInStock = Convert.ToInt32(quantityTextBox.Text),
+                        ProductDescription = descriptionTextBox.Text,
+                        ProductPhoto = Product.ProductPhoto
+                    };
                     db.Product.Add(Product);
                     db.SaveChanges();
                     MessageBox.Show("Товар добавлен");
@@ -136,17 +145,22 @@ namespace OOOSportWPF.Windows
                 }
                 else
                 {
-                    Product.ProductArticleNumber = artikulTextBox.Text;
-                    Product.ProductName = nameTextBox.Text;
-                    Product.UnitTypeID = unitComboBox.SelectedIndex + 1;
-                    Product.ProductCost = Convert.ToDecimal(unitCostTextBox.Text.Replace('.',','));
-                    Product.ProductMaxDiscountAmount = Convert.ToByte(maxDiscountTextBox.Text);
-                    Product.ProductManufacturerID = manufacturerComboBox.SelectedIndex + 1;
-                    Product.ProductSupplierID = supplierComboBox.SelectedIndex + 1;
-                    Product.ProductCategoryID = categoryComboBox.SelectedIndex + 1;
-                    Product.ProductDiscountAmount = Convert.ToByte(currentDiscountTextBox.Text);
-                    Product.ProductQuantityInStock = Convert.ToInt32(quantityTextBox.Text);
-                    Product.ProductDescription = descriptionTextBox.Text;
+                    Product = new Product
+                    {
+                        ProductID = Product.ProductID,
+                        ProductArticleNumber = artikulTextBox.Text,
+                        ProductName = nameTextBox.Text,
+                        UnitTypeID = unitComboBox.SelectedIndex + 1,
+                        ProductCost = Convert.ToDecimal(unitCostTextBox.Text.Replace('.', ',')),
+                        ProductMaxDiscountAmount = Convert.ToByte(maxDiscountTextBox.Text),
+                        ProductManufacturerID = manufacturerComboBox.SelectedIndex + 1,
+                        ProductSupplierID = supplierComboBox.SelectedIndex + 1,
+                        ProductCategoryID = categoryComboBox.SelectedIndex + 1,
+                        ProductDiscountAmount = Convert.ToByte(currentDiscountTextBox.Text),
+                        ProductQuantityInStock = Convert.ToInt32(quantityTextBox.Text),
+                        ProductDescription = descriptionTextBox.Text,
+                        ProductPhoto = Product.ProductPhoto
+                    };
                     db.Entry(Product).State = System.Data.Entity.EntityState.Modified;
                     db.SaveChanges();
                     MessageBox.Show("Товар обновлен");
@@ -190,18 +204,43 @@ namespace OOOSportWPF.Windows
                 string fileName = fileGuid + fileExtension;
                 string newFilePath = System.IO.Path.Combine(folderpath, fileName);
                 productImage.Source = null;
-                using (var fileStream = new FileStream(newFilePath, FileMode.OpenOrCreate))
+
+                System.Drawing.Image img = System.Drawing.Image.FromFile(op.FileName);
+                ImageFormat format = ImageFormat.Jpeg;
+                switch (fileExtension.ToLower())
                 {
-                    fileStream.Write(imageBytes, 0, imageBytes.Length);
+                    case ".bmp":
+                        format = ImageFormat.Bmp;
+                        break;
+                    case ".gif":
+                        format = ImageFormat.Gif;
+                        break;
+                    case ".jpeg":
+                    case ".jpg":
+                        format = ImageFormat.Jpeg;
+                        break;
+                    case ".png":
+                        format = ImageFormat.Png;
+                        break;
+                    case ".tiff":
+                        format = ImageFormat.Tiff;
+                        break;
+                    case ".wmf":
+                        format = ImageFormat.Wmf;
+                        break;
+                    default:
+                        throw new ArgumentException("Unsupported image format");
                 }
 
-                Uri fileUri = new Uri(newFilePath);
-                BitmapImage image = new BitmapImage(fileUri);                
+                img.Save(newFilePath, format);
 
-                Product.ProductPhoto = fileName;               
-                productImage.Source = image;
+                Uri imageUri = new Uri(newFilePath);
+                BitmapImage bitmap = new BitmapImage(imageUri);
+                productImage.Source = bitmap;
+
+                Product.ProductPhoto = fileName;
             }
-            MessageBox.Show("Изображение загружено!");            
+            MessageBox.Show("Изображение загружено!");
         }
     }
 }

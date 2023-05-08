@@ -45,7 +45,7 @@ namespace OOOSportWPF.Windows
             productPanel = productsPanel;
             using (var db = new EntityModel())
             {
-                var productsAll = db.Product.OrderByDescending(v=>v.ProductID).ToList();
+                var productsAll = db.Product.OrderByDescending(v => v.ProductID).ToList();
                 if (filterText.Replace(" ", "") != "")
                 {
                     products = (from p in db.Product where p.ProductName.Contains(filterText) select p).ToList();
@@ -118,7 +118,7 @@ namespace OOOSportWPF.Windows
                     endPanel.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(70) });
 
                     var txtDiscount = new TextBlock() { FontSize = 18, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, FontWeight = FontWeights.Bold };
-                    var btnEdit= new Button() { Content = "Изменить", Tag = product };
+                    var btnEdit = new Button() { Content = "Изменить", Tag = product };
 
                     btnEdit.Click += BtnEdit_Click;
                     Grid.SetRow(txtDiscount, 0);
@@ -211,8 +211,15 @@ namespace OOOSportWPF.Windows
 
         private void btnAddProduct_Click(object sender, RoutedEventArgs e)
         {
-            this.Hide();
+            WindowState savedWindowState = this.WindowState;
+
+            this.Close();
+
             new MakeEditProductWindow(null).ShowDialog();
+
+            // Load the saved window state after showing the dialog
+            this.WindowState = savedWindowState;
+
             loadDataSet();
             loadData();
             this.Show();
