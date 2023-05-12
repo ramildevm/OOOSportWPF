@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Word = Microsoft.Office.Interop.Word;
 
 namespace OOOSportWPF.Windows
 {
@@ -22,11 +23,12 @@ namespace OOOSportWPF.Windows
         private User user;
         private List<Product> orderProducts;
         private List<ProductObjectClass> productObjects;
+        DateTime createDate, deliveryDate;
+        int getCode, price = 0, totalPrice =0;
 
         public MakeOrderWindow()
         {
-            InitializeComponent();
-            
+            InitializeComponent();            
         }
 
         public MakeOrderWindow(List<Product> orderProducts, User user)
@@ -41,10 +43,13 @@ namespace OOOSportWPF.Windows
 
         private void refreshOrderData()
         {
-           
+            if (productObjects.Count == 0)
+            {
+                MessageBox.Show("Отмена заказа","Внимание",MessageBoxButton.OK);
+                this.Close();
+            }
             using (var db = new EntityModel())
             {
-                int price = 0, discount = 0, totalPrice = 0;
                 bool isEnough = true;
                 foreach(var p in productObjects)
                 {
@@ -52,10 +57,12 @@ namespace OOOSportWPF.Windows
                         isEnough = false;
                     int productPrice = (int)p.Product.ProductCost * p.Quantity;
                     price += productPrice;
-                    totalPrice += (productPrice * (100 - Convert.ToInt32(p.Product.ProductDiscountAmount))) / 100;
+                    totalPrice += productPrice * (100 - Convert.ToInt32(p.Product.ProductDiscountAmount)) / 100;
                 }
-                if(!isEnough)
-                    txtDeliveryDate.Text = "Доставка до: " + DateTime.Now.AddDays(6).ToString("yyyy-MM-dd");
+                if (!isEnough) {
+                    deliveryDate = DateTime.Now.AddDays(6);
+                    txtDeliveryDate.Text = "Доставка до: " + deliveryDate.ToString("yyyy/MM/dd");
+                }
                 txtPrice.Text = "Цена: " + price + " руб.";
                 txtTotalPrice.Text = "Цена со скидкой: " + totalPrice + " руб.";
             }
@@ -70,10 +77,17 @@ namespace OOOSportWPF.Windows
                 comboBoxPickUp.DisplayMemberPath = "Address";
                 var lastOrder = db.Order.ToList().LastOrDefault();
                 txtId.Text = "Id заказа: " + (lastOrder == null ? "1" : (lastOrder.OrderID + 1).ToString());
-                DateTime date = DateTime.Now;
-                DateTime newDate = date.AddDays(3);
-                txtCreateDate.Text = "Создан: " + newDate.ToString("yyyy-MM-dd");
-                txtDeliveryDate.Text = "Доставка до: " + date.ToString("yyyy-MM-dd");
+                createDate = DateTime.Now;
+                deliveryDate = createDate.AddDays(3);
+                txtCreateDate.Text = "Создан: " + createDate.ToString("yyyy/MM/dd");
+                txtDeliveryDate.Text = "Доставка до: " + deliveryDate.ToString("yyyy/MM/dd");
+
+                var rnd = new Random();
+                getCode = rnd.Next(100, 999);
+                while(db.Order.FirstOrDefault(o=>o.OrderStatusID!=2 && o.OrderGetCode == 0)!=null)
+                    getCode = rnd.Next(100, 999);
+                txtCode.Text = "Код для получения: " + getCode.ToString();
+                
             }
         }
 
@@ -136,14 +150,15 @@ namespace OOOSportWPF.Windows
                     {
                         productObjects.Remove(row);
                         productsGrid.Items.Refresh();
-
                     }
                     else
                     {
                         textBox.Text = "1";
+                        productObjects.FirstOrDefault(v => v.Product == row.Product).Quantity = quantity;
                     }
                 }
-                productObjects.FirstOrDefault(v => v.Product == row.Product).Quantity = quantity;
+                else
+                    productObjects.FirstOrDefault(v => v.Product == row.Product).Quantity = quantity;
                 refreshOrderData();
             }
             catch
@@ -168,7 +183,104 @@ namespace OOOSportWPF.Windows
 
         private void btnOrderProduct_Click(object sender, RoutedEventArgs e)
         {
+            if(comboBoxPickUp.SelectedIndex == -1)
+            {
+                MessageBox.Show("Выберите пункт выдачи!");
+                return;
+            }
+            var order = new Order()
+            {
+                OrderStatusID = 1,
+                OrderCreateDate = createDate,
+                OrderDeliveryDate = deliveryDate,
+                PickupPointID = comboBoxPickUp.SelectedIndex + 1,
+                OrderGetCode = getCode,
+                UserID = null
+            };
+            if (user != null)
+                order.UserID = user.UserID;
+            using(var db = new EntityModel())
+            {
+                var result = db.Order.Add(order);
+                foreach(var product in productObjects)
+                {
+                    db.OrderProduct.Add(new OrderProduct()
+                    {
+                        OrderID = result.OrderID,
+                        ProductID = product.Product.ProductID,
+                        Count = product.Quantity
+                    });
+                }
+                db.SaveChanges();
+                makePdf(result);
+                this.Close();
+            }
+        }
 
+        private void makePdf(Order result)
+        {
+            var app = new Word.Application();
+            Word.Document doc = app.Documents.Add();
+
+            // создание параграфа и добавление текста
+            Word.Paragraph para = doc.Content.Paragraphs.Add();
+            para.Range.Text = "ТАЛОН";
+            para.Range.Font.Size = 14;
+            para.Range.Font.Bold = 1;
+            para.Range.Paragraphs.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+            para.Range.InsertParagraphAfter();
+
+            // добавление даты и номера заказа
+            para.Range.Text = $"Номер заказа: {result.OrderID}\nДата заказа: {result.OrderCreateDate.ToShortDateString()}";
+            para.Range.Font.Size = 12;
+            para.Range.Font.Bold = 0;
+            para.Range.Paragraphs.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
+            para.Range.InsertParagraphAfter();
+
+            para.Range.Text = "Состав заказа:";
+            para.Range.Font.Size = 12;
+            para.Range.Font.Bold = 0;
+            para.Range.InsertParagraphAfter();
+
+            foreach (var product in productObjects)
+            {
+                para.Range.Text = $"  - {product.Product.ProductName}: {product.Quantity} шт. x {product.Product.ProductCost} руб. = {product.Product.ProductCost * product.Quantity} руб.";
+                para.Range.Font.Size = 12;
+                para.Range.Font.Bold = 0;
+                para.Range.InsertParagraphAfter();
+            }
+
+            para.Range.Text = $"Сумма заказа: {totalPrice}\nСумма скидки: {totalPrice-price}";
+            para.Range.Font.Size = 12;
+            para.Range.Font.Bold = 0;
+            para.Range.InsertParagraphAfter();
+
+            // добавление пункта выдачи и кода получения
+            para.Range.Text = $"Пункт выдачи: {comboBoxPickUp.SelectedValuePath}";
+            para.Range.Font.Size = 12;
+            para.Range.Font.Bold = 0; 
+            para.Range.InsertParagraphAfter();
+
+            Word.Range codeRange = doc.Content.Paragraphs.Add().Range;
+            codeRange.Text = $"Код получения: {getCode}";
+            codeRange.Font.Size = 14;
+            codeRange.Font.Bold = 1;
+            codeRange.Paragraphs.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+            codeRange.InsertParagraphAfter();
+
+
+            // Сохраняем документ в формате PDF
+            string filename = $"Талон заказа{result.OrderID.ToString()}.pdf";
+
+            app.Visible = true;
+            doc.SaveAs2(@"D:\"+filename, Word.WdExportFormat.wdExportFormatPDF);
+            MessageBox.Show(@"Товар оформлен. Талон сохранен по пути: D:\" + filename, "Результат");
+            // Открываем полученный файл
+            System.Diagnostics.Process.Start(@"D:\" + filename);
+
+            // Очищаем ресурсы
+            doc.Close();
+            app.Quit();
         }
     }
 }

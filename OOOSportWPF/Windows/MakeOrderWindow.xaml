@@ -89,6 +89,7 @@
                 <TextBlock Name="txtId"/>
                 <TextBlock Name="txtCreateDate"/>
                 <TextBlock Name="txtDeliveryDate"/>
+                <TextBlock Name="txtCode" FontWeight="Bold" FontSize="18" Margin="5,20,5,5"/>
             </StackPanel>
 
             <StackPanel Background="#498C51" Grid.Column="1" VerticalAlignment="Bottom" Margin="10">
@@ -101,7 +102,6 @@
                 <TextBlock Name="txtTotalPrice" FontSize="18" FontWeight="Bold"/>
             </StackPanel>
             <Button Name="btnOrder" Grid.Column="2" Width="150" Height="50" HorizontalAlignment="Right" Margin="10" Background="White" Click="btnOrderProduct_Click" Content="Сформировать заказ" />
-
         </Grid>
     </Grid>
 </Window>
